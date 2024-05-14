@@ -8,13 +8,12 @@
 #include "Img.h"
 
 int main(int argc, char *argv[]) {
-    /*if (argc != 2) {
+    if (argc != 2) {
         std::cout << "Wrong number of args. Command use: 'sif img.sif'";
         return 1;
-    }*/
+    }
     
-    Img img("g.sif");
-    //Img img(argv[1]);
+    Img img(argv[1]);
 
     Camera2D camera;
 
@@ -23,8 +22,13 @@ int main(int argc, char *argv[]) {
 
     SetTraceLogLevel(LOG_NONE);
 
+    Image logo = LoadImage("logo.png");
+
     InitWindow(screenWidth, screenHeight, "Simple Image Format");
+    SetWindowIcon(logo);
     SetTargetFPS(60);
+
+    UnloadImage(logo);
 
     camera.offset = (Vector2){ img.width/2.0f-img.width/2, img.height/2.0f-img.height/2 };
     camera.rotation = 0.0f;
@@ -54,13 +58,13 @@ int main(int argc, char *argv[]) {
         BeginDrawing();
             ClearBackground(BLACK);
 
-            camera.zoom += ((float)GetMouseWheelMove()*0.1f);
+            camera.zoom += ((float)GetMouseWheelMove()*(camera.zoom / 10.0f));
 
-            if (camera.zoom > 3.0f) camera.zoom = 3.0f;
+            if (camera.zoom > 10.0f) camera.zoom = 10.0f;
             else if (camera.zoom < 0.1f) camera.zoom = 0.1f;
 
-            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) camera.target.x -= GetMouseDelta().x;
-            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) camera.target.y -= GetMouseDelta().y;
+            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) camera.target.x -= GetMouseDelta().x / camera.zoom;
+            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) camera.target.y -= GetMouseDelta().y / camera.zoom;
         BeginMode2D(camera);
 
             DrawTexture(image, 0, 0, WHITE);
